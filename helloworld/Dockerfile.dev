@@ -1,0 +1,10 @@
+FROM node:20.9.0-slim
+WORKDIR /app
+
+# Install dependencies
+COPY package.json .
+
+# Install nodemon
+RUN npm install
+
+CMD [ "npm", "run", "start.dev" ]
