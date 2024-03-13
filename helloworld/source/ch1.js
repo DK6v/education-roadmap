@@ -1,10 +1,10 @@
 exports.run_ch1 = function() {
-    
+
     let respStr = "";
     let obj = new Array(1,2,3,4,5,6);
-    
-    respStr += obj.toString() + '\n'; 
-    
+
+    respStr += obj.toString() + '\n';
+
     obj.push('A', 'B', 'C');
     respStr += obj.toString() + '\n';
 
@@ -34,14 +34,14 @@ exports.run_ch1 = function() {
 
     respStr += range(1, 10).toString() + '\t' + "range(1, 10)\n";
     respStr += sum(range(1,10)).toString() + '\t' + "sum(range(1, 10))\n";
-    
+
     respStr += range(1, 10, 2).toString() + '\t' + "range(1, 10, 2)\n";
     respStr += range(10, 1, -2).toString() + '\t' + "range(10, 1, -2)\n";
     respStr += range(1, 1).toString() + '\t' + "range(1, 1)\n";
     respStr += range(1, 1, -1).toString() + '\t' + "range(1, 1, -1)\n";
     respStr += range(1, 2, -1).toString() + '\t' + "range(1, 2, -1)\n";
     respStr += reverseArray(range(1,10)).toString() + '\t' + "reverseArray(range(1, 10))\n";
-    
+
     array = range(1,10);
     reverseArrayInPlace(array);
     respStr += array.toString() + '\t' + "reverseArrayInPlace(range(1, 10))\n";
@@ -70,14 +70,14 @@ exports.run_ch1 = function() {
 
     respStr += "[+] 5.1\n";
     respStr += convolArray(range(1,10), range(5,15)) + "\t" + "convolArray([1..10], [5..15])\n";
-    
+
     respStr += "[+] 5.2\n";
     {
         let str = "a";
         loop(1,
              (n) => n < 5,
              (_) => str += String.fromCharCode(str.charCodeAt(str.length - 1) + 1),
-             (n) => n + 1); 
+             (n) => n + 1);
         respStr += str + "\t" + "loop(a..e)\n";
     }
 
@@ -114,15 +114,13 @@ exports.run_ch1 = function() {
                    .filter(a => ((a.v % 2) == 0))
                    .reduce((acc, a) => (acc + a.v), 0)
                    + "\t" + (Date.now() - start) + "ms\n";
-
-        
     }
 
     respStr += "Object properties: \n";
     for(var property of Object.getOwnPropertyNames(obj)) {
 
         respStr += " - " + property.toString() + "\n";
-    } 
+    }
 
     return respStr;
 }
@@ -171,10 +169,10 @@ let deepEqual = (a, b) => {
         (b == null) ||
         (typeof(a) != "object") ||
         (typeof(b) != "object")) {
-          
+
         return (a === b);
     }
-    
+
     if (Object.keys(a).length == Object.keys(b).length) {
 
         for (key of Object.keys(a)) {
@@ -185,7 +183,7 @@ let deepEqual = (a, b) => {
 
         return true;
     }
-    
+
     return false;
 }
 
@@ -196,7 +194,7 @@ let arrayToList = (array) => {
     let list = null;
     for (entry of array.reverse()) {
         list = {value: entry, rest: list};
-    }   
+    }
     return list;
 }
 
@@ -218,7 +216,7 @@ exports.range = function(start, end, step = 1) {
     if ((step == 0) || (((end - start) * step) < 0)) {
         return NaN;
     }
-    
+
     for (let n = start; (end - n) * step >= 0; n += step) {
         retval.push(n);
     }
@@ -249,6 +247,6 @@ let reverseArrayInPlace = (elements) => {
         elements[n - 1] = elements[elements.length - n];
         elements[elements.length - n] = tmp;
     }
-    
+
     return elements;
 }

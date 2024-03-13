@@ -1,0 +1,17 @@
+services:
+
+  nodejs:
+    image: nodejs/helloworld
+    container_name: nodejs.helloworld-ts
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    environment:
+      - NODE_SCRIPT=start.dev
+    volumes:
+      - ./source:/app/source
+
+    ports:
+      - "8081:8081"
+    restart: "no"
