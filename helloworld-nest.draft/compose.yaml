@@ -1,0 +1,18 @@
+services:
+
+  nodejs:
+    container_name: helloworld-nest.draft
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    environment:
+      - PACKAGE_SCRIPT=start:dev
+
+    volumes:
+      - ./src:/app/src
+      - ./test:/app/test
+
+    ports:
+      - "3000:3000"
+    restart: "no"
