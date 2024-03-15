@@ -1,16 +1,17 @@
 services:
 
   nodejs:
-    image: nodejs/helloworld
-    container_name: nodejs.helloworld-ts
+    container_name: nodejs.helloworld-test-esm
     build:
       context: .
       dockerfile: Dockerfile
 
     environment:
-      - NODE_SCRIPT=start
+      - NODE_SCRIPT=start.test
+      - NODE_OPTIONS=--no-warnings=ExperimentalWarning
     volumes:
       - ./source:/app/source
+      - ./test:/app/test
 
     ports:
       - "8081:8081"

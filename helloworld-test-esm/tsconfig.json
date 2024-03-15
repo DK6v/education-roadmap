@@ -1,0 +1,24 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "display": "Node 20",
+    "_version": "21.7.1",
+    "compilerOptions": {
+        "lib": [
+            "es2023",
+            "dom"
+        ],
+        "module": "ESNext",
+        "target": "es2022",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "moduleResolution": "Node",
+        "allowImportingTsExtensions": true,
+        "noEmit": true,
+        "outDir": "./dist"
+    },
+    "include": [
+        "./source/**/*"
+    ]
+}
