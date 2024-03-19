@@ -8,10 +8,10 @@ services:
       dockerfile: Dockerfile
 
     environment:
-      - NODE_SCRIPT=start
+      - NODE_SCRIPT=start:dev
     volumes:
       - ./source:/app/source
 
     ports:
-      - "8081:8081"
+      - "3000:3000"
     restart: "no"

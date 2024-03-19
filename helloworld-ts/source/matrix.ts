@@ -1,6 +1,14 @@
-
 interface HasToString { toString(): string }
 
+function logOnCreate(constructor: Function) {
+    console.log("Created: " + constructor.name);
+}
+
+function logOnCall(target, key, descriptor) {
+    console.log("Called: " + key);
+}
+
+@logOnCreate
 export class Matrix<T extends HasToString> implements Iterable<T> {
 
     protected _width: number;
@@ -23,6 +31,7 @@ export class Matrix<T extends HasToString> implements Iterable<T> {
         }
     }
 
+    @logOnCall
     toString() {
 
         let retval = "";
@@ -30,11 +39,11 @@ export class Matrix<T extends HasToString> implements Iterable<T> {
         for (let y = 0; y < this._width; y++) {
             for (let x = 0; x < this._height; x++) {
 
-                retval += this.get(x, y)
-                    .toString()
-                    .padEnd(2, ' ') + " ";
+                retval += this.get(x, y).toString().padEnd(2, ' ') + " ";
             }
-            retval += "\n";
+            if (y < this._width - 1) {
+                retval += "\n";
+            }
         }
 
         return retval;
@@ -88,6 +97,22 @@ export class Matrix<T extends HasToString> implements Iterable<T> {
 
                 return value;
             }
+        }
+    }
+}
+
+type ClassConstructor<T> = new(...args: any[]) => T
+
+export function withDebug<C extends ClassConstructor<{
+    toString(): string
+}>> (Class: C) {
+    return class extends Class {
+        constructor(...args: any[]) {
+            super(...args)
+        }
+        debug() {
+            let name = super.constructor.name;
+            return "class " + name + ":\n" + this.toString() + "";
         }
     }
 }

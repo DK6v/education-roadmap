@@ -2,7 +2,7 @@
   "main": "source/index.ts",
   "scripts": {
     "start": "ts-node source/index.ts",
-    "start.dev": "nodemon"
+    "start:dev": "nodemon"
   },
   "devDependencies": {
     "nodemon": "^3.0.3"
