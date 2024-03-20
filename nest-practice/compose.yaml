@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
 
     environment:
-      - PACKAGE_SCRIPT=start:dev
+      - PACKAGE_SCRIPT=test:e2e
 
     volumes:
       - ./src:/app/src
