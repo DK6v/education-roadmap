@@ -16,3 +16,8 @@ services:
     ports:
       - "3000:3000"
     restart: "no"
+
+networks:
+  default:
+    external: false
+    name: docker-internal

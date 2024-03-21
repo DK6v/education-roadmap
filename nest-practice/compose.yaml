@@ -1,18 +1,92 @@
 services:
 
+  init:
+    container_name: nest-practice.0.init
+    image: busybox
+
+    # Note: almquist (ash) shell syntax is used here!
+    entrypoint: /bin/sh -c
+    command: |
+              '''
+              # Change the volume owner and permissions
+              chown -R ${DOCKER_UID:-0}:${DOCKER_GID:-0} /volumes
+              chmod -R u=rwX,g=rwX /volumes
+              # Postgres database
+              chown -R 70:${DOCKER_GID:-0} /volumes/local-persist/postgresql
+              '''
+    volumes:
+      - ./local-persist/postgresql:/volumes/local-persist/postgresql
+    restart: "no"
+
   nodejs:
-    container_name: helloworld-nest.angel
+    container_name: nest-practice.server
     build:
       context: .
       dockerfile: Dockerfile
 
     environment:
-      - PACKAGE_SCRIPT=test:e2e
-
+      - PACKAGE_SCRIPT=start
+      # Postgress database
+      - POSTGRES_HOST=helloworld-nest.postgres
+      - POSTGRES_DATABASE=database
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
     volumes:
       - ./src:/app/src
       - ./test:/app/test
-
     ports:
       - "3000:3000"
+    healthcheck:
+      # Check port 3000/TCP is open
+      test: "grep -Eq \"$$(printf '[0-9]+: *[0-9A-F]{8}:%X' 3000)\" /proc/net/tcp ||
+             grep -Eq \"$$(printf '[0-9]+: *[0-9A-F]{32}:%.4X' 3000)\" /proc/net/tcp6"
+      interval: 2s
+      retries: 30
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
     restart: "no"
+
+  postgres:
+    image: postgres:16.2-alpine
+    container_name: nest-practice.postgres
+
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - ./local-persist/postgresql:/var/lib/postgresql
+      - ./local-persist/postgresql/data:/var/lib/postgresql/data
+    healthcheck:
+      # Check port 5432/TCP is open
+      test: "grep -Eq \"$$(printf '[0-9]+: *[0-9A-F]{8}:%X' 5432)\" /proc/net/tcp"
+      interval: 2s
+      retries: 30
+    depends_on:
+      init:
+        condition: service_completed_successfully
+
+  adminer:
+    image: wodby/adminer:4.8
+    container_name: nest-practice.adminer
+
+    environment:
+      - ADMINER_DEFAULT_DB_DRIVER=pgsql
+      - ADMINER_DEFAULT_DB_HOST=nest-practice.postgres
+      - ADMINER_DEFAULT_DB_NAME=db
+    ports:
+      - 9000:9000
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+networks:
+  default:
+    external: false
+    name: docker-internal
