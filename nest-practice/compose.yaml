@@ -25,7 +25,7 @@ services:
       dockerfile: Dockerfile
 
     environment:
-      - PACKAGE_SCRIPT=start
+      - PACKAGE_SCRIPT=start:dev
       # Postgress database
       - POSTGRES_HOST=helloworld-nest.postgres
       - POSTGRES_DATABASE=database
