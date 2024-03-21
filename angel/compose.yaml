@@ -1,7 +1,7 @@
 services:
 
   init:
-    container_name: nest-practice.0.init
+    container_name: angel.0.init
     image: busybox
 
     # Note: almquist (ash) shell syntax is used here!
@@ -19,13 +19,15 @@ services:
     restart: "no"
 
   nodejs:
-    container_name: nest-practice.server
+    container_name: angel.server
     build:
       context: .
       dockerfile: Dockerfile
 
     environment:
-      - PACKAGE_SCRIPT=start:dev
+      # Application parameters
+      - START_SCRIPT=${START_SCRIPT:-start}
+      - SWAGGER_ENABLED=true
       # Postgress database
       - POSTGRES_HOST=helloworld-nest.postgres
       - POSTGRES_DATABASE=database
@@ -51,7 +53,7 @@ services:
 
   postgres:
     image: postgres:16.2-alpine
-    container_name: nest-practice.postgres
+    container_name: angel.postgres
 
     environment:
       - POSTGRES_DB=db
@@ -71,11 +73,11 @@ services:
 
   adminer:
     image: wodby/adminer:4.8
-    container_name: nest-practice.adminer
+    container_name: angel.adminer
 
     environment:
       - ADMINER_DEFAULT_DB_DRIVER=pgsql
-      - ADMINER_DEFAULT_DB_HOST=nest-practice.postgres
+      - ADMINER_DEFAULT_DB_HOST=angel.postgres
       - ADMINER_DEFAULT_DB_NAME=db
     ports:
       - 9000:9000
