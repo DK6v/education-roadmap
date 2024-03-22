@@ -1,12 +1,14 @@
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  if ((process.env.SWAGGER_ENABLED ?? undefined) === "true") {
+  app.useGlobalPipes(new ValidationPipe());
 
+  if ((process.env.SWAGGER_ENABLED ?? undefined) === "true") {
     const config = new DocumentBuilder()
       .setTitle('Backend Developer Roadmap')
       .setVersion(process.env.npm_package_version)
