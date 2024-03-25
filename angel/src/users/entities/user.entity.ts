@@ -19,5 +19,5 @@ export class User {
     created_at: string;
 
     @Column()
-    deleted_at?: string;
+    deleted_at: string;
 }

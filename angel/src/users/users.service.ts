@@ -15,21 +15,7 @@ export class UsersService {
     private usersRepository: Repository<User>
   ) {}
 
-  // {"email": "user_1@example.com", "first_name": "first_name_1", "last_name": "last_name_2"}
   async create(createUserDto: CreateUserDto) {
-
-    let userExist = await this.usersRepository.find({
-      select: {
-        id: true
-      },
-      where: {
-        email: createUserDto.email
-      }})
-      .then((results: User[]) => { return results.length != 0; });
-
-    if (userExist == true) {
-      throw new HttpException('Email alredy registered', HttpStatus.CONFLICT);
-    }
 
     let user = this.usersRepository.create();
 
@@ -48,8 +34,12 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  findOne(id: number): Promise<User | null> {
-    return this.usersRepository.findOneBy({ id });
+  async findById(id: number): Promise<User | null> {
+    return await this.usersRepository.findOneBy({ id: id});
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return await this.usersRepository.findOneBy({ email: email});
   }
 
   async remove(id: number): Promise<void> {
