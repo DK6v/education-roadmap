@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
+import { AppInfoModule } from '@routes/app-info/app-info.module';
+import { UsersModule } from '@routes/users/users.module';
+import { User } from '@routes/users/entities/user.entity';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AppInfoModule } from './app-info/app-info.module';
-import { UsersModule } from './users/users.module';
-
-import { User } from './users/entities/user.entity';
 
 @Module({
   imports: [TypeOrmModule.forRoot({

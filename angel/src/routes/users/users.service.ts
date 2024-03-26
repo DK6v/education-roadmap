@@ -1,11 +1,13 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { UserDto } from './dto/user.dto ';
+
+import { getProperties } from 'decorators/property.decorator';
 
 @Injectable()
 export class UsersService {
@@ -30,8 +32,26 @@ export class UsersService {
     return new UserDto(user);
   }
 
-  findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+  async findAll(sort: string,
+                order: UsersService.SortOrder,
+                offset: number = 0,
+                limit: number = 0,
+                withDeleted: boolean = false): Promise<User[]> {
+
+    let query = {};
+
+    if (!getProperties(User).includes(sort)) {
+      return [];
+    }
+
+    query['order'] = {};
+    query['order'][sort] = order;
+    query['withDeleted'] = withDeleted;
+
+    if (offset > 0) { query['skip'] = offset; }
+    if (limit > 0)  { query['take'] = limit; }
+
+    return await this.usersRepository.find(query);
   }
 
   async findById(id: number): Promise<User | null> {
@@ -48,5 +68,12 @@ export class UsersService {
 
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
+  }
+}
+
+export namespace UsersService {
+  export enum SortOrder {
+    ASC = 'ASC',
+    DESC = 'DESC'
   }
 }
