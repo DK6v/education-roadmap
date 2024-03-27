@@ -15,7 +15,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto) {
 
@@ -49,25 +49,29 @@ export class UsersService {
     query['withDeleted'] = withDeleted;
 
     if (offset > 0) { query['skip'] = offset; }
-    if (limit > 0)  { query['take'] = limit; }
+    if (limit > 0) { query['take'] = limit; }
 
     return await this.usersRepository.find(query);
   }
 
   async findById(id: number): Promise<User | null> {
-    return await this.usersRepository.findOneBy({ id: id});
+    return await this.usersRepository.findOneBy({ id: id });
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return await this.usersRepository.findOneBy({ email: email});
+    return await this.usersRepository.findOneBy({ email: email });
   }
 
   async remove(id: number): Promise<void> {
     await this.usersRepository.delete(id);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+
+    updateUserDto['id'] = id;
+    this.usersRepository.save(updateUserDto);
+
+    return await this.findById(id);
   }
 }
 

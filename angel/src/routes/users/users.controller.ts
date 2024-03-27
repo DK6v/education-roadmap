@@ -70,7 +70,7 @@ export class UsersController {
 
     let user = await this.usersService.findById(+id);
 
-    if (user === null) {
+    if (user == null) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
@@ -78,7 +78,14 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+
+    let user = await this.usersService.findById(+id);
+
+    if (user == null) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
     return this.usersService.update(+id, updateUserDto);
   }
 

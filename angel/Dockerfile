@@ -23,5 +23,6 @@ RUN npm install
 # Creates a "dist" folder with the production build
 RUN npm run build
 
-COPY entrypoint.sh /usr/bin
+COPY --chmod=755 entrypoint.sh /usr/bin
+
 ENTRYPOINT [ "entrypoint.sh" ]
