@@ -7,7 +7,9 @@ export class GreaterThanValidationPipe implements PipeTransform {
     if (value > this.threshold) {
       return value;
     }
-    throw new BadRequestException(`Value MUST be greater than ${this.threshold}`);
+    throw new BadRequestException(
+      `Value MUST be greater than ${this.threshold}`,
+    );
   }
 }
 
@@ -18,6 +20,8 @@ export class GreaterOrEqualValidationPipe implements PipeTransform {
     if (value >= this.threshold) {
       return value;
     }
-    throw new BadRequestException(`Value MUST be greater or equal to ${this.threshold}`);
+    throw new BadRequestException(
+      `Value MUST be greater or equal to ${this.threshold}`,
+    );
   }
 }

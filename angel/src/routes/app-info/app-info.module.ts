@@ -4,6 +4,6 @@ import { AppInfoService } from './app-info.service';
 
 @Module({
   controllers: [AppInfoController],
-  providers: [AppInfoService]
+  providers: [AppInfoService],
 })
 export class AppInfoModule {}

@@ -28,6 +28,7 @@ services:
       # Application parameters
       - START_SCRIPT=${START_SCRIPT:-start}
       - SWAGGER_ENABLED=true
+      - DEBUG_LEVEL=debug
       # Postgress database
       - DB_TYPE=postgres
       - DB_HOST=angel.postgres
@@ -38,6 +39,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./test:/app/test
+
     ports:
       - "3000:3000"
     healthcheck:

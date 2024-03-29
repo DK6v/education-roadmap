@@ -1,44 +1,108 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
-    IsOptional,
-    IsString,
-    IsEmail,
-    IsNotEmpty,
-    MaxLength,
-    IsDateString
+  IsNumber,
+  IsString,
+  IsEmail,
+  IsNotEmpty,
+  MaxLength,
+  IsDateString,
 } from 'class-validator';
+import { Expose } from 'class-transformer';
 
+import { Property, getProperties } from '@decorators/property.decorator';
 import { User } from '../entities/user.entity';
 
 export class UserDto {
-
-    constructor(user: User) {
-        this.id = user.id,
-        this.email = user.email,
-        this.first_name = user.first_name,
-        this.last_name = user.last_name,
-        this.created_at = user.created_at,
-        this.deleted_at = user.deleted_at
+  constructor(user: User | null) {
+    if (user != null) {
+      getProperties(UserDto).forEach((key) => {
+        this[key] = user[key] ?? undefined;
+      });
     }
+  }
 
-    @IsNotEmpty()
-    id: number;
+  @Property()
+  @ApiProperty({
+    name: 'id',
+    type: Number,
+    description: 'Unique ID',
+    nullable: false,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  @Expose({
+    name: 'id',
+  })
+  id: number;
 
-    @IsEmail()
-    @MaxLength(255)
-    email: string;
+  @Property()
+  @ApiProperty({
+    name: 'email',
+    type: String,
+    description: 'Email address',
+    nullable: false,
+  })
+  @IsEmail()
+  @IsNotEmpty()
+  @MaxLength(255)
+  @Expose({
+    name: 'email',
+  })
+  email: string;
 
-    @IsString()
-    @MaxLength(100)
-    first_name: string;
+  @Property()
+  @ApiProperty({
+    name: 'first_name',
+    type: String,
+    description: 'First name',
+    nullable: false,
+  })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  @Expose({
+    name: 'first_name',
+  })
+  firstName: string;
 
-    @IsString()
-    @MaxLength(100)
-    last_name: string;
+  @Property()
+  @ApiProperty({
+    name: 'last_name',
+    type: String,
+    description: 'Last name',
+    nullable: false,
+  })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  @Expose({ name: 'last_name' })
+  lastName: string;
 
-    @IsDateString()
-    created_at: string;
+  @Property()
+  @ApiProperty({
+    name: 'created_at',
+    type: String,
+    description: 'Date and time of creation in UTC (ISO 8601)',
+    nullable: false,
+  })
+  @IsDateString()
+  @IsNotEmpty()
+  @Expose({
+    name: 'created_at',
+  })
+  createdAt: string;
 
-    @IsOptional()
-    @IsDateString()
-    deleted_at?: string;
+  @Property()
+  @ApiProperty({
+    name: 'deleted_at',
+    type: String,
+    description: 'Date and time of deletion in UTC (ISO 8601)',
+    nullable: false,
+  })
+  @IsDateString()
+  @IsNotEmpty()
+  @Expose({
+    name: 'deleted_at',
+  })
+  deletedAt?: string;
 }

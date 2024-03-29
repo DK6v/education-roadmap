@@ -1,65 +1,80 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { UserDto } from './dto/user.dto ';
 
 import { getProperties } from 'decorators/property.decorator';
+import { UserDto } from './dto/user.dto ';
+
+enum SortOrder {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
 
 @Injectable()
 export class UsersService {
-
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>
-  ) { }
+    private usersRepository: Repository<User>,
+  ) {}
+
+  static readonly SortOrder = SortOrder;
 
   async create(createUserDto: CreateUserDto) {
-
-    let user = this.usersRepository.create();
-
+    const user: User = this.usersRepository.create();
     user.email = createUserDto.email;
-    user.first_name = createUserDto.first_name;
-    user.last_name = createUserDto.last_name;
-    user.created_at = (new Date()).toISOString();
-    user.deleted_at = "";
+    user.firstName = createUserDto.firstName;
+    user.lastName = createUserDto.lastName;
 
-    this.usersRepository.save(user);
+    console.debug(`Create: ${JSON.stringify(user)}`);
 
-    return new UserDto(user);
+    return new UserDto(await this.usersRepository.save(user));
   }
 
-  async findAll(sort: string,
-                order: UsersService.SortOrder,
-                offset: number = 0,
-                limit: number = 0,
-                withDeleted: boolean = false): Promise<User[]> {
-
-    let query = {};
+  async findAll(
+    sort: string,
+    order: typeof SortOrder,
+    offset: number = 0,
+    limit: number = 0,
+    withDeleted: boolean = false,
+  ): Promise<UserDto[]> {
+    const query = {
+      order: {},
+      withDeleted: withDeleted,
+    };
 
     if (!getProperties(User).includes(sort)) {
       return [];
     }
 
-    query['order'] = {};
     query['order'][sort] = order;
-    query['withDeleted'] = withDeleted;
 
-    if (offset > 0) { query['skip'] = offset; }
-    if (limit > 0) { query['take'] = limit; }
+    if (offset > 0) {
+      query['skip'] = offset;
+    }
 
-    return await this.usersRepository.find(query);
+    if (limit > 0) {
+      query['take'] = limit;
+    }
+
+    console.log(typeof order);
+
+    return (await this.usersRepository.find(query)).map(
+      (user) => new UserDto(user),
+    );
   }
 
-  async findById(id: number): Promise<User | null> {
-    return await this.usersRepository.findOneBy({ id: id });
+  async findById(id: number): Promise<UserDto | null> {
+    const user = await this.usersRepository.findOneBy({ id: id });
+    return user ? new UserDto(user) : null;
   }
 
-  async findByEmail(email: string): Promise<User | null> {
-    return await this.usersRepository.findOneBy({ email: email });
+  async findByEmail(email: string): Promise<UserDto | null> {
+    const user = await this.usersRepository.findOneBy({ email: email });
+    return user ? new UserDto(user) : null;
   }
 
   async remove(id: number): Promise<void> {
@@ -67,17 +82,9 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-
     updateUserDto['id'] = id;
     this.usersRepository.save(updateUserDto);
 
     return await this.findById(id);
-  }
-}
-
-export namespace UsersService {
-  export enum SortOrder {
-    ASC = 'ASC',
-    DESC = 'DESC'
   }
 }
