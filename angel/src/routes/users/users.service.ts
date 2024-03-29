@@ -60,31 +60,42 @@ export class UsersService {
       query['take'] = limit;
     }
 
-    console.log(typeof order);
-
     return (await this.usersRepository.find(query)).map(
       (user) => new UserDto(user),
     );
   }
 
-  async findById(id: number): Promise<UserDto | null> {
-    const user = await this.usersRepository.findOneBy({ id: id });
-    return user ? new UserDto(user) : null;
+  async findById(
+    id: number,
+    withDeleted: boolean = true,
+  ): Promise<UserDto | null> {
+    const users: User[] = await this.usersRepository.find({
+      where: { id: id },
+      take: 1,
+      withDeleted: withDeleted,
+    });
+    return users.length ? new UserDto(users[0]) : null;
   }
 
-  async findByEmail(email: string): Promise<UserDto | null> {
-    const user = await this.usersRepository.findOneBy({ email: email });
-    return user ? new UserDto(user) : null;
+  async findByEmail(
+    email: string,
+    withDeleted: boolean = true,
+  ): Promise<UserDto | null> {
+    const users: User[] = await this.usersRepository.find({
+      where: { email: email },
+      take: 1,
+      withDeleted: withDeleted,
+    });
+    return users.length ? new UserDto(users[0]) : null;
   }
 
   async remove(id: number): Promise<void> {
-    await this.usersRepository.delete(id);
+    await this.usersRepository.softDelete(id);
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<UserDto> {
     updateUserDto['id'] = id;
-    this.usersRepository.save(updateUserDto);
-
-    return await this.findById(id);
+    await this.usersRepository.save(updateUserDto);
+    return new UserDto((await this.findById(id)) as User);
   }
 }

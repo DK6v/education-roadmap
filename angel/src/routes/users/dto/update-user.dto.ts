@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MaxLength } from 'class-validator';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 import { Expose } from 'class-transformer';
 
 export class UpdateUserDto {
@@ -9,6 +9,7 @@ export class UpdateUserDto {
     description: 'First name',
     nullable: true,
   })
+  @IsOptional()
   @IsString()
   @MaxLength(100)
   @Expose({
@@ -22,6 +23,7 @@ export class UpdateUserDto {
     description: 'Last name',
     nullable: true,
   })
+  @IsOptional()
   @IsString()
   @MaxLength(100)
   @Expose({

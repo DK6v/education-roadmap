@@ -2,7 +2,7 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
+  CreateDateColumn,
   DeleteDateColumn,
 } from 'typeorm';
 import { Property } from '@decorators/property.decorator';
@@ -35,7 +35,7 @@ export class User {
   @Column({
     type: 'timestamp',
   })
-  @UpdateDateColumn()
+  @CreateDateColumn()
   createdAt: string;
 
   @Property()

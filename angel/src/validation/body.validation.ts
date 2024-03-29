@@ -5,13 +5,16 @@ import { ClassConstructor, plainToClass } from 'class-transformer';
 export class PlainToClassPipe<T> implements PipeTransform {
   constructor(private readonly cls: ClassConstructor<T>) {}
   transform(value: T) {
-    console.debug(
-      'PlainToClassPipe:' +
-        '\n< ' +
-        JSON.stringify(value) +
-        '\n> ' +
-        JSON.stringify(plainToClass(this.cls, value)),
-    );
-    return plainToClass(this.cls, value);
+    if (typeof value === 'object') {
+      console.debug(
+        'PlainToClassPipe:' +
+          '\n< ' +
+          JSON.stringify(value) +
+          '\n> ' +
+          JSON.stringify(plainToClass(this.cls, value)),
+      );
+      return plainToClass(this.cls, value);
+    }
+    return value;
   }
 }

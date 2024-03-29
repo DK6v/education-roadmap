@@ -113,9 +113,8 @@ export class UsersController {
   @Get(':id')
   @ApiResponse({ status: HttpStatus.CREATED, description: 'OK' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Not found' })
-  async findById(@Param('id') id: number) {
+  async findById(@Param('id', new ParseIntPipe()) id: number) {
     const user = await this.usersService.findById(+id);
-
     if (user == null) {
       throw new NotFoundException('User not found');
     }
@@ -126,9 +125,12 @@ export class UsersController {
   @Patch(':id')
   @ApiResponse({ status: HttpStatus.CREATED, description: 'OK' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Not found' })
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    const user = await this.usersService.findById(+id);
-
+  @UsePipes(new PlainToClassPipe(CreateUserDto))
+  async update(
+    @Param('id', new ParseIntPipe()) id: number,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    const user = await this.usersService.findById(+id, false);
     if (user == null) {
       throw new NotFoundException('User not found');
     }
@@ -137,7 +139,9 @@ export class UsersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  @ApiResponse({ status: HttpStatus.OK, description: 'OK' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Not found' })
+  remove(@Param('id', new ParseIntPipe()) id: number) {
     return this.usersService.remove(+id);
   }
 }
