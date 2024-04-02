@@ -14,14 +14,12 @@ import {
   HttpStatus,
   ConflictException,
   NotFoundException,
-  UsePipes,
 } from '@nestjs/common';
 import { ApiResponse, ApiQuery } from '@nestjs/swagger';
 
 import { UsersService } from './users.service';
 import { getProperties } from '@decorators/property.decorator';
 import { GreaterOrEqualValidationPipe } from '@validation/number.validation';
-import { PlainToClassPipe } from '@validation/body.validation';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -34,7 +32,6 @@ export class UsersController {
   @Post()
   @ApiResponse({ status: HttpStatus.CREATED, description: 'OK' })
   @ApiResponse({ status: HttpStatus.CONFLICT, description: 'Conflict' })
-  @UsePipes(new PlainToClassPipe(CreateUserDto))
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.findByEmail(createUserDto.email);
     if (user != null) {
@@ -125,7 +122,6 @@ export class UsersController {
   @Patch(':id')
   @ApiResponse({ status: HttpStatus.CREATED, description: 'OK' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Not found' })
-  @UsePipes(new PlainToClassPipe(CreateUserDto))
   async update(
     @Param('id', new ParseIntPipe()) id: number,
     @Body() updateUserDto: UpdateUserDto,

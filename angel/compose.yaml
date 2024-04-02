@@ -39,6 +39,8 @@ services:
     volumes:
       - ./src:/app/src
       - ./test:/app/test
+    # Sync node_modules with the host:
+    # sudo docker cp angel.server:/app/node_modules ./node_modules
 
     ports:
       - "3000:3000"
