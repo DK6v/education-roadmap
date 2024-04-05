@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { getProperties } from '@/decorators/property.decorator';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
-
-import { getProperties } from 'decorators/property.decorator';
-import { UserDto } from './dto/user.dto ';
 
 enum SortOrder {
   ASC = 'ASC',
@@ -18,7 +18,7 @@ enum SortOrder {
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    public usersRepository: Repository<User>,
   ) {}
 
   static readonly SortOrder = SortOrder;

@@ -18,8 +18,8 @@ import {
 import { ApiResponse, ApiQuery } from '@nestjs/swagger';
 
 import { UsersService } from './users.service';
-import { getProperties } from '@decorators/property.decorator';
-import { GreaterOrEqualValidationPipe } from '@validation/number.validation';
+import { getProperties } from '@/decorators/property.decorator';
+import { GreaterOrEqualValidationPipe } from '@/validation/number.validation';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';

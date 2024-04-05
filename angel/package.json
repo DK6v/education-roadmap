@@ -1,5 +1,5 @@
 {
-  "name": "helloworld-nest.draft",
+  "name": "angel",
   "version": "0.1",
   "description": "Backend Developer Roadmap",
   "author": "Dmitry Korobkov",
@@ -32,6 +32,9 @@
     "pg": "8.11.3"
   },
   "devDependencies": {
+    "@automock/jest": "^2.1.0",
+    "@automock/adapters.nestjs": "^2.1.0",
+    "@golevelup/nestjs-testing": "^0.1.2",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
@@ -60,7 +63,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
@@ -69,6 +72,9 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "@/(.*)": "<rootDir>/src/$1"
+    }
   }
 }

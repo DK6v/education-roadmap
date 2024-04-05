@@ -5,7 +5,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
 } from 'typeorm';
-import { Property } from '@decorators/property.decorator';
+import { Property } from '@/decorators/property.decorator';
 
 @Entity()
 export class User {

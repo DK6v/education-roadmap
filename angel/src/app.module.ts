@@ -2,9 +2,11 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
-import { AppInfoModule } from '@routes/app-info/app-info.module';
-import { UsersModule } from '@routes/users/users.module';
-import { User } from '@routes/users/entities/user.entity';
+import { AppInfoModule } from '@/routes/app-info/app-info.module';
+import { UsersModule } from '@/routes/users/users.module';
+import { User } from '@/routes/users/entities/user.entity';
+
+import { AppController } from '@/app.controller';
 
 @Module({
   imports: [
@@ -22,7 +24,7 @@ import { User } from '@routes/users/entities/user.entity';
     AppInfoModule,
     UsersModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {

@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { Expose } from 'class-transformer';
 
-import { Property, getProperties } from '@decorators/property.decorator';
+import { Property, getProperties } from '@/decorators/property.decorator';
 import { User } from '../entities/user.entity';
 
 export class UserDto {
