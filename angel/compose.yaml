@@ -26,10 +26,16 @@ services:
 
     environment:
       # Application parameters
+      # ----------------------
+      # Start script: 'start', 'start:dev', 'test' or 'test:e2e' (default: start).
       - START_SCRIPT=${START_SCRIPT:-start}
+      # Enable Swagger tool (default: false).
       - SWAGGER_ENABLED=true
+      # Set debug level: 'info', 'debug' (default: 'info').
       - DEBUG_LEVEL=debug
+
       # Postgress database
+      # ------------------
       - DB_TYPE=postgres
       - DB_HOST=angel.postgres
       - DB_PORT=5432
