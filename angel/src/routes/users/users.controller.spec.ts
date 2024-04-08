@@ -37,10 +37,10 @@ describe('UsersController', () => {
     expect(service).toBeDefined();
 
     const response: UserDto = await controller.create(
-      Object.assign(userData, { id: 1 }) as CreateUserDto
+      Object.assign(userData, { id: 1 }) as CreateUserDto,
     );
 
-    console.log("Response: " + JSON.stringify(response));
+    console.log('Response: ' + JSON.stringify(response));
 
     expect(service.create).toHaveBeenCalled();
     expect(response).toEqual(Object.assign(userData, { id: 1 }) as UserDto);

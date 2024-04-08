@@ -25,6 +25,8 @@
   },
   "include": [
     "src/**/*",
-    "node_modules/**/*"
+    "test/**/*",
+    "node_modules/**/*",
+    ".eslintrc.js"
   ]
 }

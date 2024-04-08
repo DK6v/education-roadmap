@@ -4,10 +4,10 @@ import { Repository } from 'typeorm';
 
 import { getProperties } from '@/decorators/property.decorator';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserDto } from './dto/user.dto';
-import { User } from './entities/user.entity';
+import { CreateUserDto } from '@/routes/users/dto/create-user.dto';
+import { UpdateUserDto } from '@/routes/users/dto/update-user.dto';
+import { UserDto } from '@/routes/users/dto/user.dto';
+import { User } from '@/routes/users/entities/user.entity';
 
 enum SortOrder {
   ASC = 'ASC',
@@ -74,7 +74,7 @@ export class UsersService {
       take: 1,
       withDeleted: withDeleted,
     });
-    return users.length ? new UserDto(users[0]) : null;
+    return (users ?? []).length != 0 ? new UserDto(users[0]) : null;
   }
 
   async findByEmail(
@@ -86,7 +86,7 @@ export class UsersService {
       take: 1,
       withDeleted: withDeleted,
     });
-    return users.length ? new UserDto(users[0]) : null;
+    return (users ?? []).length != 0 ? new UserDto(users[0]) : null;
   }
 
   async remove(id: number): Promise<void> {
