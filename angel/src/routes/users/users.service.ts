@@ -74,6 +74,7 @@ export class UsersService {
       take: 1,
       withDeleted: withDeleted,
     });
+    console.debug(`find({id: ${id}}) => ` + JSON.stringify(users));
     return (users ?? []).length != 0 ? new UserDto(users[0]) : null;
   }
 
@@ -86,6 +87,7 @@ export class UsersService {
       take: 1,
       withDeleted: withDeleted,
     });
+    console.debug(`find({email: "${email}"}) => ` + JSON.stringify(users));
     return (users ?? []).length != 0 ? new UserDto(users[0]) : null;
   }
 
