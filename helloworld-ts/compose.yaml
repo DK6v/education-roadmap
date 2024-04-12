@@ -10,7 +10,7 @@ services:
     environment:
       - NODE_SCRIPT=start:dev
     volumes:
-      - ./source:/app/source
+      - ./src:/app/src
 
     ports:
       - "3000:3000"
