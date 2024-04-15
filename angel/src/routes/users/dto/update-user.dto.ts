@@ -15,7 +15,7 @@ export class UpdateUserDto {
   @Expose({
     name: 'first_name',
   })
-  firstName: string;
+  firstName?: string;
 
   @ApiProperty({
     name: 'last_name',
@@ -29,5 +29,5 @@ export class UpdateUserDto {
   @Expose({
     name: 'last_name',
   })
-  last_name: string;
+  last_name?: string;
 }

@@ -17,7 +17,7 @@ export class CreateUserDto {
   @Expose({
     name: 'email',
   })
-  email: string;
+  email!: string;
 
   @ApiProperty({
     name: 'first_name',
@@ -30,7 +30,7 @@ export class CreateUserDto {
   @Expose({
     name: 'first_name',
   })
-  firstName: string;
+  firstName!: string;
 
   @ApiProperty({
     name: 'last_name',
@@ -43,5 +43,5 @@ export class CreateUserDto {
   @Expose({
     name: 'last_name',
   })
-  lastName: string;
+  lastName!: string;
 }

@@ -13,7 +13,7 @@ export class User {
   @PrimaryGeneratedColumn({
     type: 'int',
   })
-  id: number;
+  id!: number;
 
   @Property()
   @Column({
@@ -21,27 +21,27 @@ export class User {
     length: 250,
     unique: true,
   })
-  email: string;
+  email!: string;
 
   @Property()
   @Column()
-  firstName: string;
+  firstName!: string;
 
   @Property()
   @Column()
-  lastName: string;
+  lastName!: string;
 
   @Property()
   @Column({
     type: 'timestamp',
   })
   @CreateDateColumn()
-  createdAt: string;
+  createdAt!: string;
 
   @Property()
   @Column({
     type: 'timestamp',
   })
   @DeleteDateColumn()
-  deletedAt: string;
+  deletedAt?: string;
 }

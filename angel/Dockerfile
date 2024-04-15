@@ -1,13 +1,15 @@
 FROM node:21.7.1-slim as build
 WORKDIR /app
 
-# Install dependencies
+# Install dependencies:
 RUN \
 # - Update package index
 apt-get update && \
 # - Install procps tools to monitor system processes
 apt-get install --assume-yes procps && \
-# Remove temporary files
+# - Python for ESLint target
+apt-get install --assume-yes python3 && \
+# - Remove temporary files
 apt-get autoremove --assume-yes && apt-get clean && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
 
 # Install dependencies

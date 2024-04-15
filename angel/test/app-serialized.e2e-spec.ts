@@ -96,7 +96,7 @@ describe('AppController (e2e), serialized', () => {
 
     const spyDbFind = jest
       .spyOn(db, 'find')
-      .mockReturnValueOnce(Promise.resolve(null));
+      .mockReturnValueOnce(Promise.resolve([]));
 
     const spyDbCreate = jest
       .spyOn(db, 'create')

@@ -21,7 +21,7 @@ async function bootstrap() {
   if ((process.env.SWAGGER_ENABLED ?? undefined) === 'true') {
     const config = new DocumentBuilder()
       .setTitle('Backend Developer Roadmap')
-      .setVersion(process.env.npm_package_version)
+      .setVersion(process.env.npm_package_version ?? '')
       .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api', app, document);

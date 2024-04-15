@@ -6,12 +6,14 @@ import * as fs from 'fs';
 
 export class AppInfoDto {
   @Exclude()
-  private package: object;
+  private package: object = {};
 
   constructor() {
-    this.package = JSON.parse(
-      fs.readFileSync(process.env.npm_package_json, 'utf-8'),
-    );
+    if (process.env.npm_package_json != undefined) {
+      this.package = JSON.parse(
+        fs.readFileSync(process.env.npm_package_json, 'utf-8'),
+      );
+    }
   }
 
   @ApiProperty({
@@ -24,7 +26,7 @@ export class AppInfoDto {
   @Expose({
     name: 'name',
   })
-  get name(): string {
+  get name(): string | undefined {
     return process.env.npm_package_name ?? undefined;
   }
 
@@ -38,7 +40,7 @@ export class AppInfoDto {
   @Expose({
     name: 'version',
   })
-  get version(): string {
+  get version(): string | undefined {
     return process.env.npm_package_version ?? undefined;
   }
 
@@ -52,7 +54,7 @@ export class AppInfoDto {
   @Expose({
     name: 'author',
   })
-  get author(): string {
+  get author(): string | undefined {
     return this.package['author'] ?? undefined;
   }
 
@@ -66,19 +68,7 @@ export class AppInfoDto {
   @Expose({
     name: 'description',
   })
-  get description(): string {
+  get description(): string | undefined {
     return this.package['description'] ?? undefined;
   }
-
-  @ApiProperty({
-    type: String,
-    description: 'Test',
-    nullable: true,
-  })
-  @IsString()
-  @MaxLength(255)
-  @Expose({
-    name: 'test',
-  })
-  test: string;
 }

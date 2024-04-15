@@ -4,6 +4,7 @@ import {
   IsString,
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   MaxLength,
   IsDateString,
 } from 'class-validator';
@@ -33,7 +34,7 @@ export class UserDto {
   @Expose({
     name: 'id',
   })
-  id: number;
+  id!: number;
 
   @Property()
   @ApiProperty({
@@ -48,7 +49,7 @@ export class UserDto {
   @Expose({
     name: 'email',
   })
-  email: string;
+  email!: string;
 
   @Property()
   @ApiProperty({
@@ -63,7 +64,7 @@ export class UserDto {
   @Expose({
     name: 'first_name',
   })
-  firstName: string;
+  firstName!: string;
 
   @Property()
   @ApiProperty({
@@ -76,7 +77,7 @@ export class UserDto {
   @IsNotEmpty()
   @MaxLength(100)
   @Expose({ name: 'last_name' })
-  lastName: string;
+  lastName!: string;
 
   @Property()
   @ApiProperty({
@@ -90,9 +91,10 @@ export class UserDto {
   @Expose({
     name: 'created_at',
   })
-  createdAt: string;
+  createdAt!: string;
 
   @Property()
+  @IsOptional()
   @ApiProperty({
     name: 'deleted_at',
     type: String,
