@@ -1,4 +1,5 @@
-import { ITest } from '~/interface/test.interface';
+import ITest from '~/interface/test.interface';
+import IReporter from '~/interface/reporter.interface';
 
 interface HasToString {
   toString(): string;
@@ -13,22 +14,24 @@ function logOnCall(_target, key, _descriptor) {
 }
 
 export class Test implements ITest {
-  run() {
-    let retValue: string = '';
+  run(reporter: IReporter): void {
+    reporter.add('Matrix =>\n');
 
     const DebugMatrix = withDebug(Matrix);
     const matrix = new DebugMatrix(5, 5, (x, y) => x + y * 5);
 
-    retValue += 'matrix -> \n' + matrix.toString() + '\n\n';
-    retValue += 'debug -> \n' + matrix.debug() + '\n\n';
+    reporter.add('matrix ->');
+    reporter.add(matrix.toString());
 
-    retValue += 'iterate -> \n';
+    reporter.add('debug ->');
+    reporter.add(matrix.debug());
+
+    reporter.add('iterate ->');
+    let items: string = '';
     matrix.forEach((value) => {
-      retValue += value.toString() + ', ';
+      items += value.toString() + ', ';
     });
-    retValue += '\n\n';
-
-    return retValue;
+    reporter.add(items);
   }
 }
 

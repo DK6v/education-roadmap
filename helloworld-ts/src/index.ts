@@ -1,23 +1,38 @@
-import * as http from 'http';
+import express from 'express';
 
-import { ITest } from '~/interface/test.interface';
+import ITest from '~/interface/test.interface';
 import * as matrix from '~/matrix';
 import * as decorators from '~/decorators';
+import * as chainPattern from '~/patterns/chain-of-responsibility';
+import * as publisherPattern from '~/patterns/publisher';
+import * as builderPattern from '~/patterns/builder';
 
-http
-  .createServer(function (
-    _request: http.IncomingMessage,
-    response: http.ServerResponse,
-  ) {
-    let respStr = 'Hello TrueScript!\n\n';
+import { StaticReporter } from './reporter';
 
-    const tests: ITest[] = [new matrix.Test(), new decorators.Test()];
+const app = express();
+const port = 3000;
 
-    tests.forEach((element) => {
-      respStr += element.run();
-    });
-    response.end(respStr);
-  })
-  .listen(3000, '0.0.0.0', function () {
-    console.log('Listen port 3000');
+app.get('/', (_request, response) => {
+  const reporter = StaticReporter.getInstance();
+
+  reporter.add('Hello TrueScript!\n');
+
+  const tests: ITest[] = [
+    new matrix.Test(),
+    new decorators.Test(),
+    new chainPattern.Test(),
+    new publisherPattern.Test(),
+    new builderPattern.Test(),
+  ];
+
+  tests.forEach((element) => {
+    reporter.add('');
+    element.run(reporter);
   });
+
+  response.setHeader('content-type', 'text/plain');
+  response.send(reporter.get().join('\n'));
+
+  reporter.clean();
+});
+app.listen(port, () => console.log(`Running on port ${port}`));

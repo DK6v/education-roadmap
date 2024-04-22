@@ -1,3 +1,5 @@
-export interface ITest {
-  run(): string;
+import IReporter from '~/interface/reporter.interface';
+
+export default interface ITest {
+  run(reporter: IReporter): void;
 }
