@@ -6,6 +6,7 @@ import * as decorators from '~/decorators';
 import * as chainPattern from '~/patterns/chain-of-responsibility';
 import * as publisherPattern from '~/patterns/publisher';
 import * as builderPattern from '~/patterns/builder';
+import * as factoryMethod from '~/patterns/factory-method';
 
 import { StaticReporter } from './reporter';
 
@@ -23,6 +24,7 @@ app.get('/', (_request, response) => {
     new chainPattern.Test(),
     new publisherPattern.Test(),
     new builderPattern.Test(),
+    new factoryMethod.Test(),
   ];
 
   tests.forEach((element) => {

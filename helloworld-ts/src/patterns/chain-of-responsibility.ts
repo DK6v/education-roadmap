@@ -30,7 +30,6 @@ class TestRootHandler extends BaseHandler {
   }
 
   handle(name: string, response: string = ''): string {
-    console.log(`${name}: `);
     return super.handle(name, response + `${name}:`);
   }
 }
