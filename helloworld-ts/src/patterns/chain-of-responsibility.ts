@@ -55,7 +55,7 @@ class TestChainOfResponsibility extends BaseHandler {}
 
 export class Test implements ITest {
   run(reporter: IReporter): void {
-    reporter.add('Chain of responsibility =>\n');
+    reporter.log('Chain of responsibility =>\n');
 
     const chain = new TestChainOfResponsibility();
     chain
@@ -65,7 +65,7 @@ export class Test implements ITest {
       .use(new TestProbabilityHandler());
 
     for (const n in [...Array(10).keys()]) {
-      reporter.add(chain.handle(n));
+      reporter.log(chain.handle(n));
     }
   }
 }

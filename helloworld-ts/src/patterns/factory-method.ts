@@ -19,7 +19,7 @@ class BaseDialog implements IDialog {
   }
 
   show(reporter: IReporter, message: string): void {
-    reporter.add(`Dialog ${this._name}: ${message}`);
+    reporter.log(`Dialog ${this._name}: ${message}`);
   }
 }
 
@@ -58,7 +58,7 @@ class BDialogFactory implements IDialogFactory {
 
 export class Test implements ITest {
   run(reporter: IReporter): void {
-    reporter.add('Factory method =>\n');
+    reporter.log('Factory method =>\n');
 
     DialogCreator.create(DialogType.A).show(reporter, 'message');
     DialogCreator.create(DialogType.B).show(reporter, 'message');

@@ -62,18 +62,18 @@ export class Base {
 
 export class Test implements ITest {
   run(reporter: IReporter): void {
-    reporter.add('Decorators =>\n');
+    reporter.log('Decorators =>\n');
 
     const base = new Base([1, 2, 3]);
 
-    reporter.add(base.toString());
-    reporter.add(JSON.stringify(base));
+    reporter.log(base.toString());
+    reporter.log(JSON.stringify(base));
 
-    reporter.add(base['newProperty'].toString());
-    reporter.add(base.newProperty.toString());
+    reporter.log(base['newProperty'].toString());
+    reporter.log(base.newProperty.toString());
 
     base.forEach((value: number) => {
-      reporter.add(value.toString());
+      reporter.log(value.toString());
     });
   }
 }

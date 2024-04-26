@@ -6,7 +6,7 @@ interface IObserver<T> {
 }
 
 interface IPublisher<T> {
-  addObserver(observer: IObserver<T>): void;
+  logObserver(observer: IObserver<T>): void;
   deleteObserver(observer: IObserver<T>): void;
   notifyObservers(event: T): void;
 }
@@ -14,7 +14,7 @@ interface IPublisher<T> {
 class BasePublisher<T> implements IPublisher<T> {
   _observers: IObserver<T>[] = [];
 
-  addObserver(observer: IObserver<T>): void {
+  logObserver(observer: IObserver<T>): void {
     this._observers.push(observer);
   }
 
@@ -45,17 +45,17 @@ class TestObserver implements IObserver<string> {
   }
 
   notify(event: string): void {
-    this._reporter.add(`${this._name}: got event '${event}'`);
+    this._reporter.log(`${this._name}: got event '${event}'`);
   }
 }
 
 export class Test implements ITest {
   run(reporter: IReporter): void {
-    reporter.add('Publisher =>\n');
+    reporter.log('Publisher =>\n');
 
     const publisher = new TestPublisher();
-    publisher.addObserver(new TestObserver(reporter, 'First'));
-    publisher.addObserver(new TestObserver(reporter, 'Second'));
+    publisher.logObserver(new TestObserver(reporter, 'First'));
+    publisher.logObserver(new TestObserver(reporter, 'Second'));
     publisher.notifyObservers('event');
   }
 }

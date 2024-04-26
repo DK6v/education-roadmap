@@ -15,23 +15,23 @@ function logOnCall(_target, key, _descriptor) {
 
 export class Test implements ITest {
   run(reporter: IReporter): void {
-    reporter.add('Matrix =>\n');
+    reporter.log('Matrix =>\n');
 
     const DebugMatrix = withDebug(Matrix);
     const matrix = new DebugMatrix(5, 5, (x, y) => x + y * 5);
 
-    reporter.add('matrix ->');
-    reporter.add(matrix.toString());
+    reporter.log('matrix ->');
+    reporter.log(matrix.toString());
 
-    reporter.add('debug ->');
-    reporter.add(matrix.debug());
+    reporter.log('debug ->');
+    reporter.log(matrix.debug());
 
-    reporter.add('iterate ->');
+    reporter.log('iterate ->');
     let items: string = '';
     matrix.forEach((value) => {
       items += value.toString() + ', ';
     });
-    reporter.add(items);
+    reporter.log(items);
   }
 }
 

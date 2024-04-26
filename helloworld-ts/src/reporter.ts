@@ -3,7 +3,7 @@ import IReporter from '~/interface/reporter.interface';
 export class BaseReporter implements IReporter {
   _reports: string[] = [];
 
-  add(log: string): void {
+  log(log: string): void {
     this._reports.push(log);
   }
 

@@ -85,7 +85,7 @@ export class URLBuilder implements IBuilder {
 
 export class Test implements ITest {
   run(reporter: IReporter): void {
-    reporter.add('URL Builder =>\n');
+    reporter.log('URL Builder =>\n');
 
     const builder = URLBuilder.create()
       .setScheme('http')
@@ -95,6 +95,6 @@ export class Test implements ITest {
       .setPort(123)
       .setPath('/foo/bar');
 
-    reporter.add('URL: ' + builder.construct());
+    reporter.log('URL: ' + builder.construct());
   }
 }

@@ -7,6 +7,7 @@ import * as chainPattern from '~/patterns/chain-of-responsibility';
 import * as publisherPattern from '~/patterns/publisher';
 import * as builderPattern from '~/patterns/builder';
 import * as factoryMethod from '~/patterns/factory-method';
+import * as compositePattern from '~/patterns/composite';
 
 import { StaticReporter } from './reporter';
 
@@ -16,7 +17,7 @@ const port = 3000;
 app.get('/', (_request, response) => {
   const reporter = StaticReporter.getInstance();
 
-  reporter.add('Hello TrueScript!\n');
+  reporter.log('Hello TrueScript!\n');
 
   const tests: ITest[] = [
     new matrix.Test(),
@@ -25,10 +26,11 @@ app.get('/', (_request, response) => {
     new publisherPattern.Test(),
     new builderPattern.Test(),
     new factoryMethod.Test(),
+    new compositePattern.Test(),
   ];
 
   tests.forEach((element) => {
-    reporter.add('');
+    reporter.log('');
     element.run(reporter);
   });
 
