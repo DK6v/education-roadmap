@@ -4,42 +4,68 @@
 #include <iostream>
 #include <mutex>
 
+#include <errno.h>
 #include <fcntl.h>
+#include <netdb.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include "SocketUDP.h"
 
 using namespace std;
 
+int MessageUDP::resolve(const std::string hostname, int port) {
+
+    int rc = 0;
+    addrinfo* result_list = NULL;
+    addrinfo hints = {
+        hints.ai_family = AF_INET,
+        // without this flag, getaddrinfo will return 3x the number of addresses
+        // (one for each socket type).
+        hints.ai_socktype = SOCK_DGRAM,
+    };
+
+    rc = getaddrinfo(hostname.c_str(), std::to_string(port).c_str(), &hints, &result_list);
+    if (rc == 0) {
+        memcpy(&address, result_list->ai_addr, result_list->ai_addrlen);
+        freeaddrinfo(result_list);
+    }
+
+    return rc;
+}
+
 SocketUDP::SocketUDP() {
-    if ((sockfd_ = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID) {
+
+    struct timeval timeout = {
+        .tv_sec = 0,
+        .tv_usec = 100'000, // ms
+    };
+
+    if ((sockfd_ = socket(AF_INET, SOCK_DGRAM, 0)) == (-1)) {
         std::cout << "[socket] failed to create" << std::endl;
-    } else {
-        struct timeval timeout = {
-            .tv_sec = 0,
-            .tv_usec = 1,
-        };
-        
-        if (setsockopt(sockfd_, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) == -1) {
-            std::cerr << "setsockopt error" << std::endl;
-        }
+        return;
+    }
 
-        int send_buf_size = 1024 * 1024 * 2 /* MB */;
-        if (setsockopt(sockfd_, SOL_SOCKET, SO_SNDBUF, &send_buf_size, sizeof(int)) == -1) {
-            std::cerr << "setsockopt error" << std::endl;
-        }
+    if (setsockopt(sockfd_, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) == (-1)) {
+        std::cerr << "setsockopt error" << std::endl;
+    }
 
-        int recv_buf_size = 1024 * 1024 * 2 /* MB */;
-        if (setsockopt(sockfd_, SOL_SOCKET, SO_RCVBUF, &recv_buf_size, sizeof(int)) == -1) {
-            std::cerr << "setsockopt error" << std::endl;
-        }
+    int send_buf_size = 1024 * 1024 * 1 /* MB */;
+    if (setsockopt(sockfd_, SOL_SOCKET, SO_SNDBUF, &send_buf_size, sizeof(int)) == (-1)) {
+        std::cerr << "setsockopt error" << std::endl;
+    }
 
-        std::cout << "[socket] created succesfully" << std::endl;
-    }}
+    int recv_buf_size = 1024 * 1024 * 1 /* MB */;
+    if (setsockopt(sockfd_, SOL_SOCKET, SO_RCVBUF, &recv_buf_size, sizeof(int)) == (-1)) {
+        std::cerr << "setsockopt error" << std::endl;
+    }
+
+    std::cout << "[socket] created succesfully" << std::endl;
+}
 
 SocketUDP::~SocketUDP() {
-    if (sockfd_ != INVALID) {
+    if (sockfd_ != (-1)) {
         close(sockfd_);
         std::cout << "[socket] closed" << std::endl;
     }
@@ -60,80 +86,94 @@ int SocketUDP::bind() {
 
 int SocketUDP::bind(uint16_t port) {
 
-    int rc = INVALID;
+    int rc = ENOERR;
 
     std::memset(&address_, 0, sizeof(address_));
-    address_.sin_family = AF_INET; // IPv4 
-    address_.sin_addr.s_addr = INADDR_ANY; 
-    address_.sin_port = htons(port); 
+    address_.sin_family = AF_INET; // IPv4
+    address_.sin_addr.s_addr = INADDR_ANY;
+    address_.sin_port = htons(port);
 
     rc = ::bind(sockfd_, (const struct sockaddr *)&address_, sizeof(address_));
-    if (rc == INVALID) {
+    if (rc == (-1)) {
         std::cout << "[socket] failed to bind" << std::endl;
         return errno;
     }
 
-    std::cout << "[socket] bound port " << port << " succesfully" << std::endl;
+    socklen_t addrlen = sizeof(address_);
+    getsockname(sockfd_, (struct sockaddr *)&address_, &addrlen);
+
+    std::cout
+        << std::format(
+            "[socket] bound port {} succesfully", ntohs(address_.sin_port))
+        << std::endl;
+
     return ENOERR;
 }
 
-std::size_t SocketUDP::receive_m(QMessageUDP *msg_p) {
+int SocketUDP::receive_m(MessageUDP *msg_p) {
 
-    static int count = 0;
+    socklen_t addressLength = sizeof(msg_p->address);
 
-    {
-        std::unique_lock<std::mutex> send_pending_lock(send_pending_lock_);
-        send_pending_cv_.wait(send_pending_lock, [&]{ return (sendPendingCount == 0); });
-        send_pending_lock.unlock();
+    const std::lock_guard<std::mutex> lock(recv_lock_);
+
+    if (msg_p == nullptr) {
+        return ENOENT;
     }
 
-    if (msg_p != nullptr) {
+    int size = ::recvfrom(
+        sockfd_,
+        msg_p->data.data(),
+        msg_p->data.size(),
+        MSG_WAITALL, /* flags */
+        &msg_p->address,
+        &addressLength);
 
-        const std::lock_guard<std::mutex> lock(recv_lock_);
-        socklen_t addressLength = sizeof(msg_p->address);
-
-        msg_p->size = ::recvfrom(
-            sockfd_,
-            msg_p->data.data(),
-            msg_p->data.size(),
-            MSG_WAITALL, /* flags */
-            &msg_p->address,
-            &addressLength);
-    }
-
-    if (msg_p->size == (-1)) {
+    if (size == (-1)) {
         msg_p->size = 0;
+        return EINVAL;
     }
 
-    return msg_p->size;
+    msg_p->size = size;
+    return ENOERR;
 }
 
-int SocketUDP::send(QMessageUDP & message ,std::string data) {
+int SocketUDP::send(MessageUDP & message) {
+    return send(
+        message,
+        std::string(message.data.begin(),
+                    message.data.begin() + message.size));
+}
+
+int SocketUDP::send(MessageUDP & message ,std::string data) {
 
     int length = 0;
 
-    {
-        const std::lock_guard<std::mutex> lock(send_pending_lock_);
-        ++sendPendingCount;
-    }
+    const std::lock_guard<std::mutex> lock(send_lock_);
 
-    {
-        const std::lock_guard<std::mutex> lock(send_lock_);
-        length = sendto(
-            sockfd_,
-            data.c_str(),
-            data.length(),  
-            MSG_CONFIRM,
-            &message.address, 
-            sizeof(message.address));
-    }
-
-    {
-        const std::lock_guard<std::mutex> lock(send_pending_lock_);
-        --sendPendingCount;
-    }
-
-    send_pending_cv_.notify_all();
+    length = sendto(
+        sockfd_,
+        data.c_str(),
+        data.length(),
+        MSG_CONFIRM,
+        &message.address,
+        sizeof(message.address));
 
     return length;
+}
+
+std::string SocketUDP::to_string(const struct sockaddr & address) {
+
+    char name[INET6_ADDRSTRLEN] = {0};
+
+    int rc =
+        getnameinfo(&address, sizeof(address),
+            name, sizeof(name),
+            nullptr, 0, /* port */
+            NI_NUMERICHOST);
+
+    if(rc != ENOERR) {
+        return std::string();
+    }
+
+    return std::string(name);
 }

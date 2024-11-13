@@ -1,6 +1,5 @@
 #include "MessageQueue.h"
 
-
 std::shared_ptr<MessageBase> MessageBase::allocate(uint32_t signo) {
     const std::lock_guard<std::mutex> lock(lock_);
     std::shared_ptr<MessageBase> msg_p = nullptr;
@@ -20,21 +19,35 @@ void MessageBase::free() {
 }
 
 void MessageQueue::send(uint32_t signo) {
-    const std::lock_guard<std::mutex> lock(lock_);
+
     auto msg_p = std::make_shared<MessageBase>();
 
-    msg_p->signo = signo;
-    queue_.push_back(msg_p);
+    {
+        const std::lock_guard<std::mutex> lock(lock_);
+
+        msg_p->signo = signo;
+        queue_.push_back(msg_p);
+    }
+
+    rcvdCV_.notify_all();
 }
 
 std::shared_ptr<MessageBase> MessageQueue::receive() {
-    const std::lock_guard<std::mutex> lock(lock_);
+
     std::shared_ptr<MessageBase> msg_p = nullptr;
+
+    std::unique_lock<std::mutex> lock(lock_);
+    rcvdCV_.wait_for(lock,
+        std::chrono::seconds(1),
+        [&]{ return !queue_.empty(); }
+    );
 
     if (!queue_.empty()) {
         msg_p = queue_.front();
         queue_.pop_front();
     }
+
+    lock.unlock();
 
     return msg_p;
 }

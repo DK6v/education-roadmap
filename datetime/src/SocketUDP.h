@@ -1,6 +1,5 @@
 #pragma once
 
-#include <errno.h>
 #include <cstdint>
 #include <array>
 #include <list>
@@ -17,12 +16,16 @@
 #define ENOERR  (0)
 #endif
 
-class SocketUDP;
+class MessageUDP {
+public:
+    int resolve(const std::string hostname, int port);
 
-struct QMessageUDP {
+public:
+    static constexpr std::size_t DATAGRAM_MAX_SIZE = {65535};
+
     struct sockaddr address;
     std::size_t size = {0};
-    std::array<char, 65535> data;
+    std::array<char, DATAGRAM_MAX_SIZE> data;
 };
 
 class SocketUDP {
@@ -36,11 +39,12 @@ public:
     virtual int bind();
     virtual int bind(uint16_t port);
 
-    int send(QMessageUDP & message ,std::string data);
+    int send(MessageUDP & message);
+    int send(MessageUDP & message, std::string data);
 
-    std::size_t receive_m(QMessageUDP *msg_p);
+    int receive_m(MessageUDP *msg_p);
 
-    static constexpr int INVALID = {-1};
+    static std::string to_string(const struct sockaddr & address);
 
 private:
     int sockfd_ = {-1};
@@ -48,10 +52,4 @@ private:
 
     std::mutex recv_lock_;
     std::mutex send_lock_;
-
-    std::mutex send_pending_lock_;
-    std::condition_variable send_pending_cv_;
-    uint32_t sendPendingCount = {0};
-
-    std::atomic_uint sendPendingCount_ = {0};
 };
