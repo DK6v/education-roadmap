@@ -1,0 +1,3 @@
+[submodule "datetime/trafgen/gencfg"]
+	path = datetime/trafgen/gencfg
+	url = git@github.com:jonschipp/gencfg.git
