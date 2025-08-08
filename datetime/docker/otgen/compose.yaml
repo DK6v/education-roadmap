@@ -1,0 +1,15 @@
+services:
+  otgen:
+    container_name: otgen
+    image: otgen:$VERSION
+    build:
+      context: source
+      dockerfile: Dockerfile
+      args:
+        - VERSION=$VERSION
+    stdin_open: true 
+    tty: true
+    volumes:
+      - ./run:/otgen/run
+    restart: "no"
+    network_mode: "host"

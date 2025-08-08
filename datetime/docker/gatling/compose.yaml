@@ -1,0 +1,14 @@
+services:
+  gatling:
+    container_name: gatling
+    image: gatling:$VERSION
+    build:
+      context: source
+      dockerfile: Dockerfile
+    stdin_open: true 
+    tty: true
+    volumes:
+      - ./scenarios:/gatling/scenarios
+      - ./.local/logs:/gatling/logs
+    restart: "no"
+    network_mode: "host"

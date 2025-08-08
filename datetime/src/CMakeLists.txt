@@ -1,8 +1,10 @@
-add_library (socket 
+add_library (socket
   MessageQueue.h
   MessageQueue.cpp
   SocketUDP.h
-  SocketUDP.cpp)
+  SocketUDP.cpp
+  TcpSocket.h
+  TcpSocket.cpp)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(CMAKE_BUILD_TYPE Debug)

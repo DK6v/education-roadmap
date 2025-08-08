@@ -1,0 +1,14 @@
+services:
+  seagull:
+    container_name: seagull
+    image: seagull
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    stdin_open: true 
+    tty: true
+    volumes:
+      - ./rfc868-env:/opt/seagull/rfc868-env
+      - ./rfc868-env/logs:/opt/seagull/rfc868-env/logs
+    restart: "no"
+    network_mode: "host"

@@ -1,0 +1,15 @@
+services:
+  snappi:
+    container_name: snappi
+    image: snappi:$VERSION
+    build:
+      context: source
+      dockerfile: Dockerfile
+      args:
+        - VERSION=$VERSION
+    stdin_open: true 
+    tty: true
+    volumes:
+      - ./config:/snappi/config
+    restart: "no"
+    network_mode: "host"

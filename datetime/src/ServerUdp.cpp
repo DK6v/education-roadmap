@@ -9,18 +9,11 @@
 #include <errno.h>
 #include <signal.h>
 
-//#include "SocketUDP.h"
-
-#include "TcpSocket.h"
+#include "SocketUDP.h"
 #include "MessageQueue.h"
 
 using namespace std;
 using namespace std::chrono;
-
-enum Signals : uint32_t {
-    TERMINATE = 0,
-    TCP_CONNECT,
-};
 
 std::atomic<bool> quit(false);
 
@@ -33,7 +26,7 @@ int main(int argc, char *argv[]) {
 
     signal(SIGINT, handleSignal);
 
-    auto port = TCP::ANY;
+    auto port = 12345;
     if (argc > 1) {
         std::istringstream ss(argv[1]);
         if (!(ss >> port)) {
@@ -48,52 +41,37 @@ int main(int argc, char *argv[]) {
     }
 
     auto queue = std::make_shared<MessageQueue>();
-    Message<TCP::TcpConnection>::preallocate(100);
+    Message<MessageUDP>::preallocate(100);
+
+    auto socket = SocketUDP();
+    if (socket.bind(port) == EXIT_FAILURE) {
+        exit(EXIT_FAILURE);
+    }
 
     std::map<std::string, int64_t> cache;
     std::mutex mutex;
 
-    auto socket = TCP::TcpSocket();
-    if (socket.listen(port, 100) != ENOERR) {
-        exit(EXIT_FAILURE);
-    }
+    auto receiver = [&]() mutable {
 
-    auto listener = [&]() mutable {
-
-        std::shared_ptr<Message<TCP::TcpConnection>> msg_p = nullptr;
+        std::shared_ptr<Message<MessageUDP>> msg_p = nullptr;
 
         while (!quit) {
+
             if (msg_p == nullptr) {
-                msg_p = Message<TCP::TcpConnection>::allocate(Signals::TCP_CONNECT);
+                msg_p = Message<MessageUDP>::allocate(Signals::DATAGRAMM);
                 continue;
             }
-            if (socket.accept(&msg_p->msg) == ENOERR) {
-                queue->send(msg_p);
-                msg_p = nullptr;
-            }
-        }
-    };
-    std::thread(listener).detach();
 
-    auto sender = [&]() mutable {
-
-        TCP::TcpMessage buffer = {0};
-        while(!quit) {
-
-            auto msg_p = std::dynamic_pointer_cast<Message<TCP::TcpConnection>>(queue->receive());
-            if (msg_p != nullptr) {
-
-                TCP::TcpConnection* conn_p = &msg_p->msg;
-                conn_p->receive(&buffer);
+            if (socket.receive_m(&msg_p->msg) == ENOERR) {
 
                 std::string name;
-                if (buffer.size != 0) {
+                if (msg_p->msg.size != 0) {
                     name = std::string(
-                        buffer.data.begin(),
-                        buffer.data.begin() + std::min(buffer.size, 16UL));
+                        msg_p->msg.data.begin(),
+                        msg_p->msg.data.begin() + std::min(msg_p->msg.size, 16UL));
                 }
 
-                auto addr = TCP::TcpSocket::to_string(conn_p->address);
+                auto addr = SocketUDP::to_string(msg_p->msg.address);
 
                 auto now = std::chrono::system_clock::now().time_since_epoch();
                 auto epoch = std::chrono::duration_cast<std::chrono::seconds>(now).count();
@@ -117,17 +95,29 @@ int main(int argc, char *argv[]) {
                         epoch, duration, addr, name)
                     << std::endl;
 
-                ((uint32_t*)buffer.data.data())[0] = static_cast<uint32_t>(epoch);
-                buffer.size = sizeof(uint32_t);
+               ((uint32_t*)msg_p->msg.data.data())[0] = static_cast<uint32_t>(epoch);
+                msg_p->msg.size = sizeof(uint32_t);
 
-                conn_p->send(buffer);
+                queue->send(msg_p);
+                msg_p = nullptr;
+            }
+        }
+    };
+    for (auto ix = 0; ix < 1; ++ix) {
+        std::thread(receiver).detach();
+    }
 
-                conn_p->close();
+    auto sender = [&]() mutable {
+        while(!quit) {
+            auto msg_p = std::dynamic_pointer_cast<Message<MessageUDP>>(queue->receive());
+            if (msg_p != nullptr) {
+                auto time = system_clock::now();
+                int rc = socket.send(msg_p->msg);
                 msg_p->free();
             }
         }
     };
-    for (auto ix = 0; ix < 10; ++ix) {
+    for (auto ix = 0; ix < 1; ++ix) {
         std::thread(sender).detach();
     }
 

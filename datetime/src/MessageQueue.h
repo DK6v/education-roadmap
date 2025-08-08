@@ -9,11 +9,6 @@
 #include <iostream>
 #include <format>
 
-enum Signals : uint32_t {
-    TERMINATE = 0,
-    DATAGRAMM
-};
-
 class MessageBase : public std::enable_shared_from_this<MessageBase> {
 public:
     MessageBase() = default;
